@@ -1,26 +1,39 @@
 const url =
     "https://guidedlearning.oracle.com/player/latest/api/scenario/get/v_IlPvRLRWObwLnV5sTOaw/5szm2kaj/?callback=__5szm2kaj&refresh=true&env=dev&type=startPanel&vars%5Btype%5D=startPanel&sid=none&_=1582203987867";
 
-const loadJquery = async () =>{
+async function loadJquery() {
     let script = document.createElement('script');
     script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
     script.type = 'text/javascript';
     document.getElementsByTagName('head')[0].appendChild(script);
-    while (typeof window.jQuery === undefined || typeof window.$ ===undefined || typeof $.ajax !== "function"||!window.jQuery){
-        await new Promise(r => setTimeout(r, 200));
+    while (typeof window.jQuery === undefined || typeof window.$ === undefined || typeof $.ajax !== "function"||!(window.$)) {
+        await new Promise(r => setTimeout(r, 1000));
     }
 }
 
-await loadJquery();
+(async() => {
+    console.log('before start');
 
-function loadCSS(){
-    $("document.createElement(\"link\")", {
-        rel: "stylesheet",
-        type: "text/css",
-        href: "https://guidedlearning.oracle.com/player/latest/static/css/stTip.css"
-    }).appendTo("head");
-}
-loadCSS();
+    await loadJquery();
+
+    console.log('after start');
+})();
+
+let loadStyle = function(url) {
+    return new Promise((resolve, reject) => {
+        let link    = document.createElement('link');
+        link.type   = 'text/css';
+        link.rel    = 'stylesheet';
+        link.onload = () => { resolve(); console.log('style has loaded'); };
+        link.href   = url;
+
+        let headScript = document.querySelector('script');
+        headScript.parentNode.insertBefore(link, headScript);
+    });
+};
+
+await loadStyle("https://guidedlearning.oracle.com/player/latest/static/css/stTip.css");
+
 
 
 //creating a tip content based on content and id
@@ -74,6 +87,17 @@ const placeTipLocation = (content) => {
     }
 }
 
-const tooltipData  = () =>{
-
+const runJsonFile  = () =>{
+    $.ajax({
+        url: url,
+        dataType: "jsonp",
+        success: function (res){
+            const steps = res.data.structure.steps;
+            console.log(steps)
+        },
+        error:function (XMLHttpRequest,textStatus,errorThrown){
+            console.log("error")
+        }
+    })
 }
+runJsonFile();

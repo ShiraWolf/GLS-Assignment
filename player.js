@@ -7,95 +7,66 @@ async function loadJquery() {
     script.type = 'text/javascript';
     document.getElementsByTagName('head')[0].appendChild(script);
     while (typeof window.jQuery === undefined || typeof window.$ === undefined || typeof $.ajax !== "function"||!(window.$)) {
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 300));
     }
 }
-
-(async() => {
     console.log('before start');
-
     await loadJquery();
-
     console.log('after start');
-})();
 
 let loadStyle = function(url) {
-    return new Promise((resolve, reject) => {
-        let link    = document.createElement('link');
-        link.type   = 'text/css';
-        link.rel    = 'stylesheet';
-        link.onload = () => { resolve(); console.log('style has loaded'); };
-        link.href   = url;
-
-        let headScript = document.querySelector('script');
-        headScript.parentNode.insertBefore(link, headScript);
-    });
+    // injecting css
+    let styleTag = document.createElement('link');
+    // Add attributes
+    styleTag.rel = 'stylesheet';
+    styleTag.href = url;
+    // Attach to the document head
+    document.head.appendChild(styleTag);
+    console.log("CSS loaded successfully!")
 };
 
-await loadStyle("https://guidedlearning.oracle.com/player/latest/static/css/stTip.css");
+loadStyle("https://guidedlearning.oracle.com/player/latest/static/css/stTip.css");
 
 
 
-//creating a tip content based on content and id
-const setTipContent =(content, id) => {
-    return `<div class="sttip" id="x_${id}" style="position: absolute;" xmlns="http://www.w3.org/1999/html">
+//creating a tip content based on content and id and adding the correct css based on the json file
+const setTipContent =(content, id,toolCSS,tooltip) => {
+    $("head").append('<style>'+toolCSS+'</style>')
+    return `<div id="x_${id}">
     <div  class="sttip">
      <div class="tooltip in">
-           <div class="tooltip-arrow">  <button onclick="prevTool(${id})" style="font-size: medium;background-color: azure"> < </button> </div>
-           <div class="tooltip-arrow second-arrow">           <button onclick="nextTool(${id})" style="font-size: medium;background-color: azure"> > </button> </div>
-           <div class="popover-inner" id="closing_${id}" style="animation: ease-out; background-color: darkcyan; font-size: large">
+           <div class="tooltip-arrow">  
+            </div>
+           <div class="tooltip-arrow second-arrow">          
+            </div>
+           <div class="popover-inner">
            ${content}
-           <button onclick="closerTool(${id})" style="font-size: medium;background-color: azure">X</button>
-                </div>
+           ${tooltip}
+           </div>
              </div>
            </div>`
 };
-
-
-function prevTool(id){
-    if (id !== 0) {
-        $("#tooltip-arrow_" + id).prev(id);
-        $("#tooltip-arrow_" + id).hide();
-    }
-}
-
-function nextTool(id){
-    if (id !== 5) {
-        $("#tooltip-arrow_" + id).next(id);
-        $("#tooltip-arrow_" + id).hide();
-    }
-}
-
-//closes tooltips using button on each of them
-const closerTool = (id) =>{
-    $("#closeing_" + id).hide();
-};
-
-//placing content based on location
-const placeTipLocation = (content) => {
-    if (content.contains("Welcome")){
-        $(content).css({"margin-top":"auto","display":"flex","flex-direction":"column","align-items":"center"})
-    }
-    else if(content.contains("Image")){
-        $(content).css({"float":"right","display": "flex"})
-    }
-    else if (content.contains("Enter")){
-        $(content).css({"margin":"0 auto","display": "block","height":"70px","padding-top":"18px"})
-    }
-    else if(content.contains("to search")){
-        $(content).css({"margin":"0 auto","display": "block"})
-    }
-}
-
+//injected setTipContent to html
 const runJsonFile  = () =>{
     $.ajax({
         url: url,
         dataType: "jsonp",
         success: function (res){
+            const resData = res.data;
             const steps = res.data.structure.steps;
-            console.log(steps)
+            for (let i=0; i < steps.length;i++){
+                const currID = steps[i].id
+                if (steps[i].action.type=== "tip"){
+                    // const next = steps[i].followers[0].next
+                    const currContent = steps[i].action.contents["#content"]
+                    const html = setTipContent(currContent,currID,resData.css,resData.tiplates.tip);
+                    const divElement = document.createElement('div');
+                    divElement.innerHTML = html;
+                    document.body.append(divElement);
+                }
+            }
         },
-        error:function (XMLHttpRequest,textStatus,errorThrown){
+        error:function (){
             console.log("error")
         }
     })

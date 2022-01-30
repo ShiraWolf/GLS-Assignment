@@ -1,7 +1,7 @@
 # GLS-Assignment
 Welcome to your google.com guide!
 Please follow these instructions to run it:
-1. Copy all of player.js
+1. Copy all of player.js (please do not rely on git copy button as it may not be updated to the latest version)
 2. Open https://www.google.com/
 3. Right click on the mouse and "inspect"
 4. Click console

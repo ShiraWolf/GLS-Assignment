@@ -1,5 +1,6 @@
 # GLS-Assignment
 Welcome to your google.com guide!
+Here is the Youtube Tutorial: https://youtu.be/5pHyMTkhx_E
 Please follow these instructions to run it:
 1. Copy all of player.js (please do not rely on git copy button as it may not be updated to the latest version)
 2. Open https://www.google.com/

@@ -19,7 +19,8 @@ let loadStyle = function(url) {
     styleTag.href = url;
     document.head.appendChild(styleTag);
 };
-
+//style='position:fixed; top: 50px; left: 50px'
+// style='display: flex; position: absolute; align-items: center'
 //creating a tip based on tip css
 const setTipTool =(toolCSS,tooltip) => {
     $("head").append('<style>'+toolCSS+'</style>')
@@ -34,8 +35,9 @@ const setTipTool =(toolCSS,tooltip) => {
         "</div>" +
         "</div>"
     );
-    $("span[data-iridize-role='stepCount']").text(steps.length);
-    $("button[data-iridize-role='closeBt']").click(closeBtn);
+    $("span[class=powered-by]").text("Powered by\nOracle");
+    $("button[data-iridize-role='laterBt']").click(closeBtn)
+    $("button[data-iridize-role='closeBt']").css({"padding": '0px 25px'}).click(closeBtn);
     $("a[data-iridize-role='nextBt']").click(nextBt);
     $("button[data-iridize-role='prevBt']").click(prevBt).css({"padding": '0px 15px'});
     toolTipContent();
@@ -69,22 +71,46 @@ function prevBt(){
 
 //changing content based on tip and currStep
 function toolTipContent(){
-    $("span[data-iridize-role='stepCount']").text(currStep);
+    $("span[data-iridize-role='stepCount']").text(currStep+" /"+(steps.length-1));
     const action = steps[currStep-1].action
     let content;
     if (action.type === "tip"){
         content = action.contents["#content"];
+        locationTip();
     }
     else{
-        $('.sttip').hide();
+        $('.sttip').remove();
     }
-    locationTip();
     $("div[data-iridize-id='content']").html(content);
 }
-<!--
-#TODO: start research on location and writing locationTip()
--->
+
 function locationTip(){
+    const action = steps[currStep-1].action
+    let content = action.contents["#content"];
+    $("sttip">"popover-inner").css({"position": "absolute","top":"50px","right":"20px"})
+    if (content.includes("Welcome")){
+        console.log("welcome")
+        $(`#x_${steps[currStep-1].id}`).css({
+            position: "absolute",
+            display: "block",
+            bottom: '',
+            right: 300,
+            top: 70
+        })
+    }
+    else if(content.includes("Image")){
+        console.log("img")
+        $(content).css({"position": "absolute","top":"50px","right":"20px"})
+    }
+    else if (content.includes("Enter")){
+        console.log("ent")
+        $(content).css({"margin":"0 auto","display": "block","height":"70px","padding-top":"18px"})
+    }
+    else if(content.includes("to search")){
+        console.log("sr")
+        $(content).css({"margin":"0 auto","display": "block"})
+    }
+
 
 }
 

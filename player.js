@@ -118,9 +118,7 @@ const runJsonFile  = () =>{
 }
 
 async function main(){
-    console.log('before start');
     await loadJquery();
-    console.log('after start');
     loadStyle("https://guidedlearning.oracle.com/player/latest/static/css/stTip.css");
     runJsonFile();
 }
